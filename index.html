@@ -29,9 +29,8 @@
     const API_KEY = 'AIzaSyAWN9cfckqJtiWaBPdcvmysW7iW9mJEVpc';
     
     // 사용자가 지정한 시트 이름과 U열(날짜), V열(자산 잔고) 범위를 설정합니다.
-    // 데이터가 많아질 것을 대비해 100번째 행까지 넉넉하게 가져옵니다.
     const SHEET_NAME = encodeURIComponent('성곤 자산'); 
-    const RANGE = `${SHEET_NAME}!U1:V501`; // U1, V1은 제목(날짜, 잔고)일 가능성이 높아 2번째 줄부터 가져옵니다.
+    const RANGE = `${SHEET_NAME}!U1:V501`; 
     const URL = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
 
     async function loadDashboardData() {
@@ -40,7 +39,7 @@
             const data = await response.json();
             
             if (!data.values || data.values.length === 0) {
-                document.getElementById('loading').innerText = "시트의 U열과 V열에 데이터가 없거나 형식이 올바르지 않습니다.";
+                document.getElementById('loading').innerText = "시트의 U열과 V열에 데이터가 없거나 형식을 올바르지 않습니다.";
                 return;
             }
 
@@ -49,11 +48,19 @@
             const dates = [];
             const balances = [];
             
+            // ⭐ [수정 부분] 1행이 '일자', '잔고(₩)' 제목이므로 2행(인덱스 1)부터 시작하도록 shift()로 제목행을 잘라냅니다.
+            if (data.values[0][0] === "일자") {
+                data.values.shift(); 
+            }
+
+            // ⭐ [수정 부분] 맨 위에 최신 날짜가 있으므로, 과거 순서로 차트를 그리기 위해 전체 배열을 뒤집습니다.
+            data.values.reverse();
+
             data.values.forEach(row => {
                 // U열(날짜)과 V열(잔고)에 모두 값이 있는 경우만 가져옵니다.
                 if(row[0] && row[1]) {
                     dates.push(row[0]); // U열 데이터 (날짜)
-                    // 금액에 포함된 콤마(,)나 원(\) 표시를 지우고 순수 숫자로 변환합니다.
+                    // 금액에 포함된 콤마(,)나 원(\), ₩ 표시를 지우고 순수 숫자로 변환합니다.
                     const cleanNumber = Number(row[1].replace(/[^0-9.-]+/g,""));
                     balances.push(cleanNumber); // V열 데이터 (잔고)
                 }
@@ -64,7 +71,7 @@
             new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: dates, // X축: 날짜
+                    labels: dates, // X축: 날짜 (이제 과거 -> 최신순으로 정렬됨)
                     datasets: [{
                         label: '총 자산 잔고',
                         data: balances, // Y축: 금액
@@ -72,7 +79,7 @@
                         backgroundColor: 'rgba(78, 115, 223, 0.05)',
                         borderWidth: 2,
                         pointBackgroundColor: '#4e73df',
-                        tension: 0.2 // 그래프 선을 살짝 부드럽게 고르는 옵션
+                        tension: 0.2 
                     }]
                 },
                 options: {
@@ -80,10 +87,10 @@
                     maintainAspectRatio: false,
                     scales: {
                         y: {
-                            beginAtZero: false, // 자산 잔고이므로 0부터 시작하지 않고 데이터 맞춤형으로 보여줍니다.
+                            beginAtZero: false, 
                             ticks: {
                                 callback: function(value) {
-                                    return value.toLocaleString() + '원'; // 금액 뒤에 '원' 붙여주고 콤마 찍기
+                                    return value.toLocaleString() + '원'; 
                                 }
                             }
                         }

@@ -97,7 +97,7 @@
 </div>
 
 <script>
-    // ⚠️ 기존에 사용하시던 값을 넣어주세요
+    // ⚠️ 기존에 사용하시던 값을 기입해 주세요
     const SHEET_ID = '1GJpFxW6yasMCEu4UKxcSsDhVnmIAMtwjPO5qQ7akBIY'; 
     const API_KEY = 'AIzaSyAWN9cfckqJtiWaBPdcvmysW7iW9mJEVpc';
     
@@ -105,14 +105,17 @@
     const RANGE = `${SHEET_NAME}!U1:V`; 
     const URL = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
 
-    // 🌐 인터넷에서 실시간 주가 및 지수를 가져오는 함수
+    // 🌐 인터넷에서 실시간 주가 및 지수를 가져오는 함수 (AllOrigins 프록시 우회 적용)
     async function fetchMarketData() {
         try {
-            // TQQQ, SOXL, VIX 종가 가져오기 (오픈 API 허브 활용)
             const stockUrl = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=TQQQ,SOXL,^VIX`;
-            // 주가 오픈 프록시를 통해 브라우저 CORS 차단 우회 연동
-            const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(stockUrl)}`);
-            const result = await response.json();
+            
+            // CORS 차단을 우회하기 위해 전송받은 내용을 객체화해주는 allorigins 프록시 사용
+            const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(stockUrl)}`);
+            const proxyData = await response.json();
+            
+            // 알맹이 텍스트를 JSON으로 파싱
+            const result = JSON.parse(proxyData.contents);
             const quotes = result.quoteResponse.result;
 
             quotes.forEach(quote => {
@@ -134,12 +137,12 @@
 
         try {
             // Fear & Greed 지수 가져오기
-            const fnfUrl = 'https://api.alternative.me/fng/'; // 대안 지수 API 사용 (0~100 스케일 동일)
+            const fnfUrl = 'https://api.alternative.me/fng/'; 
             const response = await fetch(fnfUrl);
             const result = await response.json();
             if (result.data && result.data[0]) {
                 const fngValue = result.data[0].value;
-                const fngStatus = result.data[0].value_classification; // 상태 (Greed, Fear 등)
+                const fngStatus = result.data[0].value_classification; 
                 document.getElementById('fearGreed').innerText = `${fngValue} (${fngStatus})`;
             }
         } catch (e) {

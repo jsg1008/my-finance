@@ -74,7 +74,7 @@
     const API_KEY = 'AIzaSyAWN9cfckqJtiWaBPdcvmysW7iW9mJEVpc';
     
     const SHEET_NAME = encodeURIComponent('성곤 자산'); 
-    const RANGE = `${SHEET_NAME}!U1:V501`; 
+    const RANGE = `${SHEET_NAME}!U1:V`; 
     const URL = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
 
     async function loadDashboardData() {

@@ -2,36 +2,36 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>나의 개인 재무 대시보드</title>
+    <title>나의 자산 추이 대시보드</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: sans-serif; padding: 20px; background-color: #f5f5f5; color: #333; }
-        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        h1 { text-align: center; }
-        .chart-container { position: relative; margin: auto; height: 300px; width: 300px; }
-        .loading { text-align: center; color: #888; font-style: italic; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h1 { text-align: center; margin-bottom: 30px; }
+        .chart-container { position: relative; margin: auto; height: 400px; width: 100%; }
+        .loading { text-align: center; color: #888; font-style: italic; padding: 50px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>📊 나의 자산 현황 대시보드</h1>
-    <hr>
-    <div id="loading" class="loading">구글 스프레드시트에서 데이터를 안전하게 불러오는 중...</div>
+    <h1>📈 나의 자산 추이 대시보드</h1>
+    <div id="loading" class="loading">구글 스프레드시트 '성곤 자산'에서 데이터를 안전하게 불러오는 중...</div>
     
     <div class="chart-container">
-        <canvas id="assetChart"></canvas>
+        <canvas id="assetLineChart"></canvas>
     </div>
 </div>
 
 <script>
-    // 💡 중요: 여기에 아까 준비한 본인의 정보를 정확히 입력해 주세요!
+    // 💡 중요: 본인의 정보를 정확히 입력해 주세요!
     const SHEET_ID = '1GJpFxW6yasMCEu4UKxcSsDhVnmIAMtwjPO5qQ7akBIY'; 
     const API_KEY = 'AIzaSyAWN9cfckqJtiWaBPdcvmysW7iW9mJEVpc';
     
-    // 구글 시트의 첫 번째 탭(Sheet1)의 A1부터 B10까지 데이터를 가져오는 주소입니다.
-    // (보통 A열에 자산 항목명, B열에 금액이 있다고 가정합니다.)
-    const RANGE = 'Sheet1!A1:B10'; 
+    // 사용자가 지정한 시트 이름과 U열(날짜), V열(자산 잔고) 범위를 설정합니다.
+    // 데이터가 많아질 것을 대비해 100번째 행까지 넉넉하게 가져옵니다.
+    const SHEET_NAME = encodeURIComponent('성곤 자산'); 
+    const RANGE = `${SHEET_NAME}!U2:V100`; // U1, V1은 제목(날짜, 잔고)일 가능성이 높아 2번째 줄부터 가져옵니다.
     const URL = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
 
     async function loadDashboardData() {
@@ -40,48 +40,63 @@
             const data = await response.json();
             
             if (!data.values || data.values.length === 0) {
-                document.getElementById('loading').innerText = "시트에 데이터가 없거나 형식이 올바르지 않습니다.";
+                document.getElementById('loading').innerText = "시트의 U열과 V열에 데이터가 없거나 형식이 올바르지 않습니다.";
                 return;
             }
 
             document.getElementById('loading').style.display = 'none';
 
-            // 구글 시트에서 자산 이름(labels)과 금액(values)을 분리합니다.
-            const labels = [];
-            const values = [];
+            const dates = [];
+            const balances = [];
             
             data.values.forEach(row => {
+                // U열(날짜)과 V열(잔고)에 모두 값이 있는 경우만 가져옵니다.
                 if(row[0] && row[1]) {
-                    labels.push(row[0]);
-                    // 숫자에 콤마(,)가 있으면 제거하고 숫자로 변환합니다.
-                    values.push(Number(row[1].replace(/[^0-9.-]+/g,"")));
+                    dates.push(row[0]); // U열 데이터 (날짜)
+                    // 금액에 포함된 콤마(,)나 원(\) 표시를 지우고 순수 숫자로 변환합니다.
+                    const cleanNumber = Number(row[1].replace(/[^0-9.-]+/g,""));
+                    balances.push(cleanNumber); // V열 데이터 (잔고)
                 }
             });
 
-            // 🎨 화면에 예쁜 도넛 차트(원형 그래프)를 그립니다.
-            const ctx = document.getElementById('assetChart').getContext('2d');
+            // 🎨 화면에 자산 변화 추이를 보여주는 선 그래프를 그립니다.
+            const ctx = document.getElementById('assetLineChart').getContext('2d');
             new Chart(ctx, {
-                type: 'doughnut',
+                type: 'line',
                 data: {
-                    labels: labels,
+                    labels: dates, // X축: 날짜
                     datasets: [{
-                        data: values,
-                        backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796']
+                        label: '총 자산 잔고',
+                        data: balances, // Y축: 금액
+                        borderColor: '#4e73df',
+                        backgroundColor: 'rgba(78, 115, 223, 0.05)',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#4e73df',
+                        tension: 0.2 // 그래프 선을 살짝 부드럽게 고르는 옵션
                     }]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false, // 자산 잔고이므로 0부터 시작하지 않고 데이터 맞춤형으로 보여줍니다.
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString() + '원'; // 금액 뒤에 '원' 붙여주고 콤마 찍기
+                                }
+                            }
+                        }
+                    }
                 }
             });
 
         } catch (error) {
             console.error(error);
-            document.getElementById('loading').innerText = "데이터를 불러오는 데 실패했습니다. 보안 설정이나 시트 ID를 확인해 주세요.";
+            document.getElementById('loading').innerText = "데이터를 불러오는 데 실패했습니다. 시트명('성곤 자산')과 데이터 위치를 다시 확인해 주세요.";
         }
     }
 
-    // 페이지가 열리면 자동으로 데이터를 불러옵니다.
     loadDashboardData();
 </script>
 </body>

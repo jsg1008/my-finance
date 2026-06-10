@@ -8,6 +8,7 @@
         body { font-family: sans-serif; padding: 20px; background-color: #f8f9fc; color: #333; }
         .container { max-width: 1000px; margin: 0 auto; }
         h1 { text-align: center; margin-bottom: 30px; font-weight: 700; color: #4e73df; }
+        h2 { font-size: 18px; font-weight: 700; color: #5a5c69; margin-top: 40px; margin-bottom: 15px; }
         
         /* 💎 대시보드 카드 스타일 */
         .dashboard-cards {
@@ -26,12 +27,16 @@
         .card.success { border-left-color: #1cc88a; }
         .card.info { border-left-color: #36b9cc; }
         .card.warning { border-left-color: #f6c23e; }
+        .card.purple { border-left-color: #854d0e; } /* 시장 지표용 커스텀 색상 테두리 */
+        .card.dark { border-left-color: #374151; }
+        .card.red { border-left-color: #b91c1c; }
+        .card.orange { border-left-color: #ea580c; }
         
         .card-title { font-size: 12px; font-weight: bold; color: #858796; text-transform: uppercase; margin-bottom: 5px; }
         .card-value { font-size: 22px; font-weight: bold; color: #5a5c69; }
         
         /* 📈 차트 영역 스타일 */
-        .chart-section { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .chart-section { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 10px; }
         .chart-container { position: relative; height: 400px; width: 100%; }
         .loading { text-align: center; color: #888; font-style: italic; padding: 50px; background: white; border-radius: 12px; }
     </style>
@@ -67,9 +72,32 @@
             <canvas id="assetLineChart"></canvas>
         </div>
     </div>
+
+    <div id="marketSectionTitle" style="display: none;">
+        <h2>🌐 주요 시장 지표 (어제 종가 기준)</h2>
+    </div>
+    <div id="marketCardsSection" class="dashboard-cards" style="display: none;">
+        <div class="card dark">
+            <div class="card-title">TQQQ 종가</div>
+            <div id="tqqqClose" class="card-value">- $</div>
+        </div>
+        <div class="card orange">
+            <div class="card-title">SOXL 종가</div>
+            <div id="soxlClose" class="card-value">- $</div>
+        </div>
+        <div class="card red">
+            <div class="card-title">VIX 지수</div>
+            <div id="vixIndex" class="card-value">-</div>
+        </div>
+        <div class="card purple">
+            <div class="card-title">Fear & Greed 지수</div>
+            <div id="fearGreed" class="card-value">-</div>
+        </div>
+    </div>
 </div>
 
 <script>
+    // ⚠️ 기존에 사용하시던 값을 기입해 주세요
     const SHEET_ID = '1GJpFxW6yasMCEu4UKxcSsDhVnmIAMtwjPO5qQ7akBIY'; 
     const API_KEY = 'AIzaSyAWN9cfckqJtiWaBPdcvmysW7iW9mJEVpc';
     
@@ -104,7 +132,7 @@
                 }
             });
 
-            // 🧮 대시보드 카드용 데이터 계산 (시트 상단이 최신이므로 데이터 원본 기준으로 계산)
+            // 🧮 대시보드 카드용 데이터 계산
             const currentBal = balances[0]; // 최신 잔고
             const previousBal = balances[1] || currentBal; // 전날 잔고
             const change = currentBal - previousBal; // 변동액
@@ -127,10 +155,19 @@
             document.getElementById('maxBalance').innerText = maxBal.toLocaleString() + '원';
             document.getElementById('recordDays').innerText = totalDays.toLocaleString() + '일';
 
+            // 🔍 임시 데이터 매핑 (구글 시트 연동 전 화면 확인용 기본값)
+            // 추후 이 지표 데이터들도 구글 시트 특정 셀에 넣어두시면 자동으로 연동되도록 수정 가능합니다.
+            document.getElementById('tqqqClose').innerText = '$0.00';
+            document.getElementById('soxlClose').innerText = '$0.00';
+            document.getElementById('vixIndex').innerText = '0.00';
+            document.getElementById('fearGreed').innerText = '0';
+
             // 로딩 숨기고 콘텐츠 보이기
             document.getElementById('loading').style.display = 'none';
             document.getElementById('cardsSection').style.display = 'grid';
             document.getElementById('chartSection').style.display = 'block';
+            document.getElementById('marketSectionTitle').style.display = 'block';
+            document.getElementById('marketCardsSection').style.display = 'grid';
 
             // 차트 그리기를 위해 과거순으로 배열 뒤집기
             dates.reverse();
@@ -149,8 +186,8 @@
                         backgroundColor: 'rgba(78, 115, 223, 0.05)',
                         borderWidth: 2,
                         pointBackgroundColor: '#4e73df',
-                        pointRadius: 1,           // 평소 점의 크기 (기존 기본값은 3~4 정도입니다. 1로 하면 아주 작아집니다)
-                        pointHoverRadius: 4,      // 마우스를 올렸을 때만 점이 커지는 크기
+                        pointRadius: 1,           
+                        pointHoverRadius: 4,      
                         tension: 0.2 
                     }]
                 },

@@ -31,7 +31,7 @@
     // 사용자가 지정한 시트 이름과 U열(날짜), V열(자산 잔고) 범위를 설정합니다.
     // 데이터가 많아질 것을 대비해 100번째 행까지 넉넉하게 가져옵니다.
     const SHEET_NAME = encodeURIComponent('성곤 자산'); 
-    const RANGE = `${SHEET_NAME}!U2:V100`; // U1, V1은 제목(날짜, 잔고)일 가능성이 높아 2번째 줄부터 가져옵니다.
+    const RANGE = `${SHEET_NAME}!U3:V600`; // U1, V1은 제목(날짜, 잔고)일 가능성이 높아 2번째 줄부터 가져옵니다.
     const URL = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
 
     async function loadDashboardData() {

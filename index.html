@@ -6,7 +6,8 @@
     <title>나의 자산 추이 대시보드</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     <style>
         :root {
             --bg:        #0d0f14;
@@ -21,8 +22,8 @@
             --red:       #f05a6e;
             --orange:    #fb923c;
             --purple:    #a78bfa;
-            --font-mono: 'IBM Plex Mono', monospace;
-            --font-body: 'Noto Sans KR', sans-serif;
+            --font-mono: 'DM Mono', 'Courier New', monospace;
+            --font-body: 'Pretendard', 'Plus Jakarta Sans', -apple-system, sans-serif;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -33,6 +34,9 @@
             color: var(--text);
             padding: 32px 20px;
             min-height: 100vh;
+            font-weight: 400;
+            -webkit-font-smoothing: antialiased;
+            letter-spacing: -0.01em;
         }
 
         .container { max-width: 1060px; margin: 0 auto; }
@@ -47,9 +51,9 @@
             padding-bottom: 20px;
         }
         header h1 {
-            font-family: var(--font-mono);
+            font-family: var(--font-body);
             font-size: 22px;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--accent);
             letter-spacing: -0.5px;
         }
@@ -57,16 +61,17 @@
             font-size: 12px;
             color: var(--muted);
             font-family: var(--font-mono);
+            font-weight: 400;
         }
 
         /* ── SECTION TITLE ── */
         .section-title {
-            font-family: var(--font-mono);
+            font-family: var(--font-body);
             font-size: 11px;
             font-weight: 600;
             color: var(--muted);
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 2.5px;
             margin: 36px 0 14px;
         }
 
@@ -100,25 +105,27 @@
         .card[data-accent="muted"]  { --accent-color: var(--muted); }
 
         .card-label {
-            font-family: var(--font-mono);
-            font-size: 10px;
-            font-weight: 600;
+            font-family: var(--font-body);
+            font-size: 11px;
+            font-weight: 500;
             color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
+            letter-spacing: 0.5px;
             margin-bottom: 8px;
         }
         .card-value {
-            font-family: var(--font-mono);
+            font-family: var(--font-body);
             font-size: 20px;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--text);
             line-height: 1;
+            letter-spacing: -0.5px;
         }
         .card-sub {
+            font-family: var(--font-mono);
             font-size: 11px;
             color: var(--muted);
             margin-top: 5px;
+            font-weight: 400;
         }
 
         /* ── CHART ── */
@@ -136,10 +143,11 @@
             margin-bottom: 20px;
         }
         .chart-title {
-            font-family: var(--font-mono);
-            font-size: 13px;
+            font-family: var(--font-body);
+            font-size: 14px;
             font-weight: 600;
             color: var(--text);
+            letter-spacing: -0.3px;
         }
         .legend-row {
             display: flex;
@@ -150,9 +158,10 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            font-family: var(--font-mono);
-            font-size: 11px;
+            font-family: var(--font-body);
+            font-size: 12px;
             color: var(--muted);
+            font-weight: 400;
         }
         .legend-dot {
             width: 10px; height: 3px;
@@ -177,17 +186,19 @@
             gap: 3px;
         }
         .trend-label {
-            font-family: var(--font-mono);
+            font-family: var(--font-body);
             font-size: 10px;
             color: var(--muted);
             text-transform: uppercase;
             letter-spacing: 1px;
+            font-weight: 500;
         }
         .trend-value {
-            font-family: var(--font-mono);
-            font-size: 14px;
-            font-weight: 600;
+            font-family: var(--font-body);
+            font-size: 15px;
+            font-weight: 700;
             color: var(--text);
+            letter-spacing: -0.3px;
         }
         .up   { color: var(--green) !important; }
         .down { color: var(--red) !important; }
@@ -200,8 +211,9 @@
             gap: 10px;
             padding: 60px;
             color: var(--muted);
-            font-family: var(--font-mono);
-            font-size: 13px;
+            font-family: var(--font-body);
+            font-size: 14px;
+            font-weight: 400;
         }
         .spinner {
             width: 18px; height: 18px;
@@ -217,8 +229,9 @@
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            font-family: var(--font-mono);
+            font-family: var(--font-body);
             font-size: 10px;
+            font-weight: 500;
             color: var(--muted);
             border: 1px solid var(--border);
             border-radius: 4px;
@@ -240,8 +253,9 @@
             margin-top: 48px;
             padding-top: 20px;
             border-top: 1px solid var(--border);
-            font-family: var(--font-mono);
-            font-size: 11px;
+            font-family: var(--font-body);
+            font-size: 12px;
+            font-weight: 400;
             color: var(--muted);
             text-align: center;
         }
@@ -416,83 +430,111 @@ const pct  = v => (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
 //  시장 데이터 (Yahoo Finance → allorigins 대체 프록시)
 //  여러 프록시를 순서대로 시도해 안정성 확보
 // ─────────────────────────────────────────────
-async function fetchViaProxy(targetUrl) {
-    // 프록시 목록 — 앞에서부터 순서대로 시도
-    const proxies = [
-        u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
-        u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
-        u => `https://thingproxy.freeboard.io/fetch/${u}`,
+// ─────────────────────────────────────────────
+//  시장 데이터
+// ─────────────────────────────────────────────
+
+// Yahoo Finance v8 chart API (CORS 프록시 경유) — v7/quote보다 안정적
+async function fetchYahooQuote(symbol) {
+    const encoded  = encodeURIComponent(symbol);
+    const yahooUrl = `https://query2.finance.yahoo.com/v8/finance/chart/${encoded}?interval=1d&range=2d`;
+    const proxies  = [
+        `https://corsproxy.io/?${encodeURIComponent(yahooUrl)}`,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(yahooUrl)}`,
     ];
-    for (const mkProxy of proxies) {
+    for (const url of proxies) {
         try {
-            const res = await fetch(mkProxy(targetUrl), { signal: AbortSignal.timeout(6000) });
-            if (res.ok) {
-                const text = await res.text();
-                return JSON.parse(text);
-            }
-        } catch (_) { /* 다음 프록시 시도 */ }
+            const res  = await fetch(url, { signal: AbortSignal.timeout(7000) });
+            if (!res.ok) continue;
+            const json = await res.json();
+            const meta = json?.chart?.result?.[0]?.meta;
+            if (!meta) continue;
+            return {
+                price:         meta.regularMarketPrice,
+                previousClose: meta.chartPreviousClose ?? meta.previousClose ?? meta.regularMarketPrice,
+            };
+        } catch (_) { /* 다음 프록시 */ }
     }
-    throw new Error('모든 프록시 실패');
+    throw new Error(`${symbol} 로드 실패`);
 }
 
 async function fetchMarketData() {
-    // ── Yahoo Finance (TQQQ, SOXL, ^VIX) ──
-    try {
-        const yahooUrl = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=TQQQ,SOXL,%5EVIX&fields=regularMarketPrice,regularMarketChange,regularMarketChangePercent';
-        const data = await fetchViaProxy(yahooUrl);
-        const quotes = data?.quoteResponse?.result ?? [];
+    // ── TQQQ / SOXL / VIX ──
+    const targets = [
+        { sym: 'TQQQ', priceId: 'tqqqClose', changeId: 'tqqqChange', isDollar: true  },
+        { sym: 'SOXL', priceId: 'soxlClose', changeId: 'soxlChange', isDollar: true  },
+        { sym: '^VIX', priceId: 'vixIndex',  changeId: 'vixChange',  isDollar: false },
+    ];
+    for (const t of targets) {
+        try {
+            const { price, previousClose } = await fetchYahooQuote(t.sym);
+            const change    = price - previousClose;
+            const changePct = (change / previousClose) * 100;
+            const arrow     = change >= 0 ? '▲' : '▼';
+            const absChange = Math.abs(change);
 
-        const displayQuote = (symbol, elPrice, elChange) => {
-            const q = quotes.find(x => x.symbol === symbol);
-            if (!q) return;
-            const price  = q.regularMarketPrice ?? 0;
-            const change = q.regularMarketChange ?? 0;
-            const chPct  = q.regularMarketChangePercent ?? 0;
-            document.getElementById(elPrice).textContent = `$${price.toFixed(2)}`;
-            const chEl = document.getElementById(elChange);
-            const chText = `${change >= 0 ? '▲' : '▼'} ${Math.abs(change).toFixed(2)} (${Math.abs(chPct).toFixed(2)}%)`;
-            chEl.textContent = chText;
+            document.getElementById(t.priceId).textContent =
+                t.isDollar ? `$${price.toFixed(2)}` : price.toFixed(2);
+
+            const chEl = document.getElementById(t.changeId);
+            chEl.textContent = t.isDollar
+                ? `${arrow} $${absChange.toFixed(2)}  (${Math.abs(changePct).toFixed(2)}%)`
+                : `${arrow} ${absChange.toFixed(2)}`;
             chEl.className = 'card-sub ' + (change >= 0 ? 'up' : 'down');
-        };
-
-        displayQuote('TQQQ',  'tqqqClose', 'tqqqChange');
-        displayQuote('SOXL',  'soxlClose', 'soxlChange');
-
-        const vixQ = quotes.find(x => x.symbol === '^VIX');
-        if (vixQ) {
-            const price = vixQ.regularMarketPrice ?? 0;
-            document.getElementById('vixIndex').textContent = price.toFixed(2);
-            const ch = vixQ.regularMarketChange ?? 0;
-            const chEl = document.getElementById('vixChange');
-            chEl.textContent = `${ch >= 0 ? '▲' : '▼'} ${Math.abs(ch).toFixed(2)}`;
-            chEl.className = 'card-sub ' + (ch >= 0 ? 'up' : 'down');
+        } catch (e) {
+            console.warn(e.message);
+            document.getElementById(t.priceId).textContent  = '조회 실패';
+            document.getElementById(t.changeId).textContent = '새로고침 재시도';
         }
-    } catch (e) {
-        console.warn('Yahoo Finance 실패:', e);
-        ['tqqqClose','soxlClose','vixIndex'].forEach(id => {
-            document.getElementById(id).textContent = '불러오기 실패';
-        });
     }
 
-    // ── Fear & Greed ──
+    // ── Fear & Greed — CNN Money 공식 API ──
     try {
-        const res  = await fetch('https://api.alternative.me/fng/', { signal: AbortSignal.timeout(5000) });
+        const cnnUrl   = 'https://production.dataviz.cnn.io/index/fearandgreed/graphdata';
+        const proxied  = `https://corsproxy.io/?${encodeURIComponent(cnnUrl)}`;
+        const res      = await fetch(proxied, { signal: AbortSignal.timeout(7000) });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
-        if (json?.data?.[0]) {
-            const { value, value_classification } = json.data[0];
-            const el = document.getElementById('fearGreed');
-            el.textContent = value;
+        const fg   = json?.fear_and_greed;
+        if (!fg) throw new Error('파싱 실패');
 
-            // 색상으로 심리 표현
-            const num = parseInt(value);
-            if      (num <= 25) el.className = 'card-value down';
-            else if (num >= 75) el.className = 'card-value up';
-            else                el.className = 'card-value';
+        const score  = Math.round(fg.score);
+        const rating = fg.rating;
+        const ratingKo = {
+            'Extreme Fear': '극단적 공포',
+            'Fear':         '공포',
+            'Neutral':      '중립',
+            'Greed':        '탐욕',
+            'Extreme Greed':'극단적 탐욕',
+        };
+        const el = document.getElementById('fearGreed');
+        el.textContent = score;
+        if      (score <= 25) el.className = 'card-value down';
+        else if (score >= 75) el.className = 'card-value up';
+        else                  el.className = 'card-value';
+        document.getElementById('fearGreedSub').textContent =
+            (ratingKo[rating] ?? rating) + '  ·  CNN Money';
 
-            document.getElementById('fearGreedSub').textContent = value_classification;
+    } catch (cnnErr) {
+        console.warn('CNN F&G 실패:', cnnErr.message, '→ alternative.me fallback');
+        try {
+            const res  = await fetch('https://api.alternative.me/fng/?limit=1', { signal: AbortSignal.timeout(5000) });
+            const json = await res.json();
+            if (json?.data?.[0]) {
+                const { value, value_classification } = json.data[0];
+                const el  = document.getElementById('fearGreed');
+                el.textContent = value;
+                const num = parseInt(value);
+                if      (num <= 25) el.className = 'card-value down';
+                else if (num >= 75) el.className = 'card-value up';
+                else                el.className = 'card-value';
+                document.getElementById('fearGreedSub').textContent =
+                    value_classification + '  ·  Crypto Index';
+            }
+        } catch (e2) {
+            document.getElementById('fearGreed').textContent    = '오류';
+            document.getElementById('fearGreedSub').textContent = '새로고침 시 재시도';
         }
-    } catch (e) {
-        document.getElementById('fearGreed').textContent = '불러오기 실패';
     }
 }
 
@@ -661,8 +703,9 @@ async function loadDashboard() {
                     y: {
                         ticks: {
                             color: '#64748b',
-                            font: { family: "'IBM Plex Mono', monospace", size: 10 },
-                            callback: v => (v / 1e8).toFixed(0) + '억',
+                            font: { family: "'DM Mono', monospace", size: 10 },
+                            stepSize: 50000000,
+                            callback: v => (v / 1e8).toFixed(1) + '억',
                         },
                         grid: { color: '#1e2535' },
                     },
